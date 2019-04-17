@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Sorting Application</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+	$(document).ready(function() {
+		$('#inputArrayLabel').hide();
+		$('#outputArrayLabel').hide();
+		$('#timeTakenLabel').hide();
+		$('#resultsBtn').hide();
+		
+		$("#sortBtn").click(function() {
+			if($('#inputText').val().trim() == ""){
+				$('#errorMessageDiv').html("Please enter values in the Input Box");
+			} else {
+				var hostPath = window.location.host;
+				$.ajax({
+					url : "http://" + hostPath + "/sortarrays/"
+							+ $('#inputText').val(),
+					type: 'post',
+					success : function(result) {
+						if(result.responseCode == 0){
+							$('#inputArrayLabel').show();
+							$('#outputArrayLabel').show();
+							$('#timeTakenLabel').show();
+							$("#inputArray").html(result.inputArray);
+							$("#outputArray").html(result.outputArray);
+							$("#timeTaken").html(result.timeTaken);
+							$('#resultsBtn').show();
+						} else {
+							$('#errorMessageDiv').html(result.responseMessage);
+						}
+					}
+				});
+			}
+		});
+		
+		$("#resultsBtn").click(function() {
+			var hostPath = window.location.host;
+			$.ajax({
+				url : "http://" + hostPath + "/getresults",
+				success : function(result) {
+					if(result.length != 0){
+						$('#resultsTable').append('<tr style="border: solid;"><td style="width: 33%;border: solid">Input Numbers</td><td style="width: 33%;border: solid">Sorted Numbers</td><td style="width: 33%;border: solid">Time Taken</td></tr>');
+						$.each(result, function(index) {
+							$('#resultsTable').append('<tr style="border: solid;">');
+							$('#resultsTable').append("<td>" + result[index].inputArray + "</td>");
+							$('#resultsTable').append("<td>" + result[index].outputArray + "</td>");
+							$('#resultsTable').append("<td>" + result[index].timeTaken + "</td>");
+							$('#resultsTable').append("</tr>");
+				        });
+					} else {
+						$('#errorMessageDiv').html("No results found");
+						$('#resultsBtn').hide();
+					}
+				}
+			});
+		});
+		
+	});
+</script>
+</head>
+<body>
+	<div id="heading" style="text-align: center">
+		<h1>Number Sort Application</h1>
+	</div>
+	<div id="errorMessageDiv" style="width: 100%;color: red;">
+	</div>
+
+	<table>
+		<tr>
+			<td style="width: 33%">Enter utmost 50 numbers from 1-100 (Comma
+				separated)</td>
+			<td style="width: 33%"><input type="text" id="inputText"
+				style="width: 100%" /></td>
+			<td style="width: 33%"></td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td><button id="resultsBtn">Get Previous Results</button></td>
+			<td><button id="sortBtn">Sort Numbers</button></td>
+			<td><!-- <button id="mySort">Sort Method 2</button> --></td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td><label id="inputArrayLabel">Here's the Input Numbers:</label></td>
+			<td id="inputArray"></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><label id="outputArrayLabel">Here's the Sorted Numbers:</label></td>
+			<td id="outputArray"></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><label id="timeTakenLabel">Time taken to Sort the Numbers (In Milliseconds):</label></td>
+			<td id="timeTaken"></td>
+			<td></td>
+		</tr>
+	</table>
+	<div id="resultDiv" style="width: 100%">
+	<table id="resultsTable" style="border: solid;">
+	</table>
+	</div>
+
+</body>
+</html>
